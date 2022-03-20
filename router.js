@@ -3,18 +3,19 @@ const { getDb, saveDb } = require('./db');
 
 const router = express.Router();
 
-router.get('/todo', async (req, res) => {
+router.get('/todo', async (req, res, next) => {
   try {
     const data = await getDb();
-    res.status(202).send(data.todo);
+    res.status(200).send(data.todo);
   } catch (err) {
-    res.status(500).send({
-      err: err.message
-    });
+    next(err);
+    // res.status(500).send({
+    //   err: err.message
+    // });
   }
 });
 
-router.get('/todo/:id', async (req, res) => {
+router.get('/todo/:id', async (req, res, next) => {
   try {
     const data = await getDb();
     const todo = data.todo.find(item => item.id === +req.params.id);
@@ -23,13 +24,14 @@ router.get('/todo/:id', async (req, res) => {
     }
     res.status(202).send(data.todo);
   } catch (err) {
-    res.status(500).send({
-      err: err.message
-    });
+    next(err);
+    // res.status(500).send({
+    //   err: err.message
+    // });
   }
 });
 
-router.post('/todo', async (req, res) => {
+router.post('/todo', async (req, res, next) => {
   console.log('body: ', req.body);
   try {
     const postData = req.body;
@@ -43,9 +45,7 @@ router.post('/todo', async (req, res) => {
     await saveDb(db);
     res.json(postData);
   } catch (err) {
-    res.status(500).json({
-      err: err.message
-    });
+    next(err);
   }
 });
 
@@ -63,7 +63,7 @@ router.patch('/todo/:id', async (req, res) => {
   res.send(todo);
 });
 
-router.delete('/todo/:id', async (req, res) => {
+router.delete('/todo/:id', async (req, res, next) => {
   try {
     const id = +req.params.id;
     const db = await getDb();
@@ -78,9 +78,7 @@ router.delete('/todo/:id', async (req, res) => {
     await saveDb(db);
     res.send(db);
   } catch (err) {
-    res.status(500).json({
-      err: err.message
-    });
+    next(err);
   }
 });
 
